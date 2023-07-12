@@ -18,7 +18,6 @@ const Home = ({navigation}) => {
   const [statR, setStatR] = useState('');
   useEffect(() => {
     let ignore = false;
-    // console.warn('inside home', navigation.navigate('Flashcard'));
     if (!ignore) getData();
     return () => {
       ignore = true;
