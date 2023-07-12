@@ -12,10 +12,15 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({navigation}) => {
+  // for controlling dark/light mode color schemes
   const colorScheme = Appearance.getColorScheme();
-  const [statK, setStatK] = useState('');
-  const [statD, setStatD] = useState('');
-  const [statR, setStatR] = useState('');
+
+  // for fetching and updating the report view
+  const [stateK, setStateK] = useState(''); // know state
+  const [stateD, setStateD] = useState(''); // don't know state
+  const [stateR, setStateR] = useState(''); // research state
+
+  // fetching data everytime the screen loads
   useEffect(() => {
     let ignore = false;
     if (!ignore) getData();
@@ -23,19 +28,22 @@ const Home = ({navigation}) => {
       ignore = true;
     };
   });
+
+  // fetching data from Async Storage and putting in state variables
   const getData = async () => {
-    let know = await AsyncStorage.getItem('knowKey');
-    setStatK(know);
-    know = await AsyncStorage.getItem('dKnowKey');
-    setStatD(know);
-    know = await AsyncStorage.getItem('resKey');
-    setStatR(know);
+    let know = await AsyncStorage.getItem('know');
+    setStateK(know);
+    know = await AsyncStorage.getItem('dontKnow');
+    setStateD(know);
+    know = await AsyncStorage.getItem('research');
+    setStateR(know);
   };
-  const setData = async () => {
-    await AsyncStorage.setItem('knowKey', '0');
-    await AsyncStorage.setItem('dKnowKey', '0');
-    await AsyncStorage.setItem('resKey', '0');
-    getData();
+
+  // When called, reset all data to '0'
+  const resetData = async () => {
+    await AsyncStorage.setItem('know', '0');
+    await AsyncStorage.setItem('dontKnow', '0');
+    await AsyncStorage.setItem('research', '0');
   };
   return (
     <View style={styles.container}>
@@ -47,25 +55,23 @@ const Home = ({navigation}) => {
               borderRadius: 25,
               backgroundColor: '#525252',
               padding: 40,
-              //   alignItems: 'center',
               justifyContent: 'center',
               width: 350,
               height: 200,
             }}>
             <Text style={[styles.report, {color: 'green'}]}>
-              {statK}
+              {stateK}
               <Text style={styles.report}> I know</Text>
             </Text>
             <Text style={[styles.report, {color: 'red'}]}>
-              {statD}
+              {stateD}
               <Text style={styles.report}> I don't know</Text>
             </Text>
             <Text style={[styles.report, {color: 'orange'}]}>
-              {statR}
+              {stateR}
               <Text style={styles.report}> Need Research</Text>
             </Text>
           </View>
-          {/* <Button title="Reveal" onPress={getData} /> */}
           <View
             style={{
               margin: 100,
@@ -83,11 +89,11 @@ const Home = ({navigation}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  setData();
+                  resetData();
                   navigation.navigate('Flashcard', {
-                    setStatK,
-                    setStatD,
-                    setStatR,
+                    setStateK,
+                    setStateD,
+                    setStateR,
                   });
                 }}>
                 <Text
@@ -105,7 +111,8 @@ const Home = ({navigation}) => {
     </View>
   );
 };
-// const fontColor = colorScheme === 'dark' ? 'black' : '#F7F5F2';
+
+// for stylizing components
 const styles = StyleSheet.create({
   report: {
     color: '#EBEBE3',
@@ -116,7 +123,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: 'black',
   },
   dark: {
     color: 'white',

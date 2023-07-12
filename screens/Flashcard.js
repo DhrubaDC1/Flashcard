@@ -1,5 +1,3 @@
-/* eslint-disable no-alert */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {
   SafeAreaView,
@@ -13,27 +11,39 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// for controlling dark/light mode color schemes
 const colorScheme = Appearance.getColorScheme();
 const color = colorScheme === 'dark' ? '#F7F5F2' : 'black';
 const fontColor = colorScheme === 'dark' ? 'black' : '#F7F5F2';
-const Flashcard = ({route, navigation}) => {
-  const {setStatK, setStatD, setStatR} = route.params;
-  var k = '';
-  const [card, setCard] = useState('0');
+
+const Flashcard = ({route}) => {
+  // getting parameters passed by Home.js navigate function
+  const {setStateK, setStateD, setStateR} = route.params;
+
+  var temp = '';
+
+  // for index of question and answer
+  const [count, setCount] = useState('0');
+
+  // For writing to Async Storage
   const setData = async (key, val) => {
     await AsyncStorage.setItem(key, val);
   };
-  const incData = async key => {
+
+  // For incrementing the existing value by 1
+  const incrementData = async key => {
     let value = await AsyncStorage.getItem(key);
     if (value === null) {
       setData(key, '0');
     }
-    k = await AsyncStorage.getItem(key);
-    k = (parseInt(k) + 1).toString();
-    setData(key, k.toString());
-    setStatK(await AsyncStorage.getItem('knowKey'));
-    setStatD(await AsyncStorage.getItem('dKnowKey'));
-    setStatR(await AsyncStorage.getItem('resKey'));
+    temp = await AsyncStorage.getItem(key);
+    temp = (parseInt(temp) + 1).toString();
+    setData(key, temp.toString());
+
+    // send the current progress to home screen
+    setStateK(await AsyncStorage.getItem('know'));
+    setStateD(await AsyncStorage.getItem('dontKnow'));
+    setStateR(await AsyncStorage.getItem('research'));
   };
   return (
     <View style={styles.container}>
@@ -52,15 +62,14 @@ const Flashcard = ({route, navigation}) => {
               title="Next Card >"
               color="white"
               onPress={() => {
-                if (parseInt(card) < 9) {
-                  setCard((parseInt(card) + 1).toString());
+                if (parseInt(count) < 9) {
+                  setCount((parseInt(count) + 1).toString());
                 } else {
-                  setCard('0');
+                  setCount('0');
                 }
               }}
             />
           </View>
-
           <View
             style={{
               margin: 30,
@@ -71,10 +80,10 @@ const Flashcard = ({route, navigation}) => {
             }}>
             <View style={{padding: 30}}>
               <Text style={{fontWeight: 'bold', color: fontColor}}>
-                Question {parseInt(card) + 1}:
+                Question {parseInt(count) + 1}:
               </Text>
               <Text style={{color: fontColor}}>
-                {qa.map(q => q.question)[parseInt(card)]}
+                {qa.map(q => q.question)[parseInt(count)]}
               </Text>
             </View>
             <View style={{paddingHorizontal: 30}}>
@@ -82,7 +91,7 @@ const Flashcard = ({route, navigation}) => {
                 Answer:
               </Text>
               <Text style={{color: fontColor}}>
-                {qa.map(q => q.answer)[parseInt(card)]}
+                {qa.map(q => q.answer)[parseInt(count)]}
               </Text>
             </View>
           </View>
@@ -105,7 +114,7 @@ const Flashcard = ({route, navigation}) => {
                 title="I know"
                 color={'white'}
                 onPress={() => {
-                  incData('knowKey');
+                  incrementData('know');
                 }}
               />
             </View>
@@ -122,7 +131,7 @@ const Flashcard = ({route, navigation}) => {
               <Button
                 title="I don't know"
                 color={'white'}
-                onPress={() => incData('dKnowKey')}
+                onPress={() => incrementData('dontKnow')}
               />
             </View>
             <View
@@ -133,12 +142,11 @@ const Flashcard = ({route, navigation}) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
-                // margin: 5,
               }}>
               <Button
                 title="Need Research"
                 color={'white'}
-                onPress={() => incData('resKey')}
+                onPress={() => incrementData('research')}
               />
             </View>
           </View>
@@ -148,6 +156,7 @@ const Flashcard = ({route, navigation}) => {
   );
 };
 
+// for stylizing components
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,6 +170,8 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
+// Array of objects for questions and answers
 const qa = [
   {
     question: 'What are Props in React Component?',
