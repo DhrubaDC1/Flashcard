@@ -1,0 +1,36 @@
+import React from 'react';
+import {useColorScheme} from 'react-native';
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
+import Home from './screens/Home';
+import Flashcard from './screens/Flashcard';
+
+const MyTheme = {
+  dark: true,
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'black',
+  },
+};
+
+const Stack = createNativeStackNavigator();
+
+const App = () => {
+  const scheme = useColorScheme();
+  return (
+    <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Flashcard" component={Flashcard} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
