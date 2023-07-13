@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
@@ -19,22 +18,9 @@ const Home = ({navigation, route}) => {
   const [stateK, setStateK] = useState(''); // know state
   const [stateD, setStateD] = useState(''); // don't know state
   const [stateR, setStateR] = useState(''); // research state
-  // const [stateC, setStateC] = useState(''); // count state
-  // const [countFlag, setCountFlag] = useState(false);
-  // console.warn(countFlag);
 
+  // for transfering the count value from home to flashcard to home
   var transferCount = '0';
-
-  // if (route.params === undefined) {
-  //   console.warn('inside undefined');
-  // } else {
-  //   const {count} = route.params;
-  // }
-
-  // if (countFlag) {
-  //   console.warn(countFlag);
-  //   const {count} = route.params;
-  // }
 
   // fetching data everytime the screen loads
   useEffect(() => {
@@ -55,7 +41,6 @@ const Home = ({navigation, route}) => {
     setStateR(val);
     val = await AsyncStorage.getItem('count');
     transferCount = val;
-    // setStateC(count);
   };
 
   // When called, reset all data to '0'
@@ -69,13 +54,32 @@ const Home = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <SafeAreaView>
-        <View style={{}}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 10,
+          }}>
+          <Text
+            style={[
+              Appearance.getColorScheme() === 'dark'
+                ? styles.dark
+                : styles.light,
+              {
+                fontSize: 50,
+                fontWeight: 'bold',
+              },
+            ]}>
+            Flashcard
+          </Text>
+        </View>
+        <View>
           <View
             style={{
-              margin: 100,
+              margin: 50,
               borderRadius: 25,
               backgroundColor: '#525252',
-              padding: 30,
+              padding: 20,
               justifyContent: 'center',
               width: 350,
               height: 200,
@@ -129,15 +133,7 @@ const Home = ({navigation, route}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  // resetData();
-                  // console.warn(countFlag);
-                  // if (countFlag) {
-                  //   transferCount = count;
-                  //   console.warn(transferCount);
-                  // }
-                  // setCountFlag(true);
                   if (route.params === undefined) {
-                    console.warn('undefined');
                   } else {
                     const {count} = route.params;
                     transferCount = count;

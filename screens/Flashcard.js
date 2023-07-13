@@ -10,11 +10,27 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {count} from 'console';
 
 // for controlling dark/light mode color schemes
 const colorScheme = Appearance.getColorScheme();
-const color = colorScheme === 'dark' ? '#F7F5F2' : 'black';
+function color(count) {
+  if (arrKnow.includes(count)) {
+    return 'green';
+  } else if (arrDontKnow.includes(count)) {
+    return 'red';
+  } else if (arrResearch.includes(count)) {
+    return 'orange';
+  } else {
+    return colorScheme === 'dark' ? '#F7F5F2' : '#525252';
+  }
+}
 const fontColor = colorScheme === 'dark' ? 'black' : '#F7F5F2';
+
+// arrays for keeping track of tags
+const arrKnow = [];
+const arrDontKnow = [];
+const arrResearch = [];
 
 const Flashcard = ({navigation, route}) => {
   // getting parameters passed by Home.js navigate function
@@ -60,17 +76,31 @@ const Flashcard = ({navigation, route}) => {
     }
   };
 
+  //remove all instances of a value from array
+  function removeItemAll(arr, value) {
+    var i = 0;
+    while (i < arr.length) {
+      if (arr[i] === value) {
+        arr.splice(i, 1);
+      } else {
+        ++i;
+      }
+    }
+    return arr;
+  }
+
   return (
     <View style={styles.container}>
       <SafeAreaView>
         <View style={{alignItems: 'center', justifyContent: 'center'}}>
           <View
             style={{
-              backgroundColor: '#EC625F',
+              backgroundColor: '#068FFF',
               width: 150,
               height: 50,
               alignItems: 'center',
               justifyContent: 'center',
+              margin: 10,
               borderRadius: 10,
             }}>
             <Button
@@ -79,7 +109,6 @@ const Flashcard = ({navigation, route}) => {
               onPress={() => {
                 navigation.navigate('Home', {
                   count,
-                  // setStateC,
                 });
               }}
             />
@@ -105,7 +134,7 @@ const Flashcard = ({navigation, route}) => {
             style={{
               margin: 30,
               borderRadius: 25,
-              backgroundColor: color,
+              backgroundColor: color(count),
               width: 350,
               height: 500,
             }}>
@@ -134,7 +163,7 @@ const Flashcard = ({navigation, route}) => {
             }}>
             <View
               style={{
-                backgroundColor: 'green',
+                backgroundColor: arrKnow.includes(count) ? 'grey' : 'green',
                 width: 110,
                 height: 60,
                 alignItems: 'center',
@@ -143,8 +172,11 @@ const Flashcard = ({navigation, route}) => {
               }}>
               <Button
                 title="👍 I know"
-                color={'white'}
+                color="white"
                 onPress={() => {
+                  arrKnow.push(count);
+                  removeItemAll(arrDontKnow, count);
+                  removeItemAll(arrResearch, count);
                   incrementData('know');
                   nextQues();
                 }}
@@ -152,7 +184,7 @@ const Flashcard = ({navigation, route}) => {
             </View>
             <View
               style={{
-                backgroundColor: 'red',
+                backgroundColor: arrDontKnow.includes(count) ? 'grey' : 'red',
                 width: 140,
                 height: 60,
                 alignItems: 'center',
@@ -164,6 +196,9 @@ const Flashcard = ({navigation, route}) => {
                 title="👎 Don't know"
                 color={'white'}
                 onPress={() => {
+                  arrDontKnow.push(count);
+                  removeItemAll(arrKnow, count);
+                  removeItemAll(arrResearch, count);
                   incrementData('dontKnow');
                   nextQues();
                 }}
@@ -171,7 +206,9 @@ const Flashcard = ({navigation, route}) => {
             </View>
             <View
               style={{
-                backgroundColor: 'orange',
+                backgroundColor: arrResearch.includes(count)
+                  ? 'grey'
+                  : 'orange',
                 width: 100,
                 height: 60,
                 alignItems: 'center',
@@ -182,6 +219,9 @@ const Flashcard = ({navigation, route}) => {
                 title="Need 📚 Research"
                 color={'white'}
                 onPress={() => {
+                  arrResearch.push(count);
+                  removeItemAll(arrDontKnow, count);
+                  removeItemAll(arrKnow, count);
                   incrementData('research');
                   nextQues();
                 }}

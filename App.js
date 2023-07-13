@@ -16,7 +16,10 @@ const App = () => {
   const scheme = useColorScheme();
   return (
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Flashcard" component={Flashcard} />
       </Stack.Navigator>
