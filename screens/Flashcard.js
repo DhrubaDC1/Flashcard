@@ -16,26 +16,31 @@ const colorScheme = Appearance.getColorScheme();
 const color = colorScheme === 'dark' ? '#F7F5F2' : 'black';
 const fontColor = colorScheme === 'dark' ? 'black' : '#F7F5F2';
 
-const Flashcard = ({route}) => {
+const Flashcard = ({navigation, route}) => {
   // getting parameters passed by Home.js navigate function
-  const {setStateK, setStateD, setStateR} = route.params;
+  const {setStateK, setStateD, setStateR, transferCount} = route.params;
 
   var temp = '';
 
   // for index of question and answer
-  const [count, setCount] = useState('0');
+  const [count, setCount] = useState(transferCount);
 
   // For writing to Async Storage
   const setData = async (key, val) => {
     await AsyncStorage.setItem(key, val);
   };
 
-  // For incrementing the existing value by 1
-  const incrementData = async key => {
+  // For initializing value if not available
+  const initValue = async key => {
     let value = await AsyncStorage.getItem(key);
     if (value === null) {
       setData(key, '0');
     }
+  };
+
+  // For incrementing the existing value by 1
+  const incrementData = async key => {
+    initValue(key);
     temp = await AsyncStorage.getItem(key);
     temp = (parseInt(temp) + 1).toString();
     setData(key, temp.toString());
@@ -45,6 +50,16 @@ const Flashcard = ({route}) => {
     setStateD(await AsyncStorage.getItem('dontKnow'));
     setStateR(await AsyncStorage.getItem('research'));
   };
+
+  // For getting the next question
+  const nextQues = () => {
+    if (parseInt(count) < 9) {
+      setCount((parseInt(count) + 1).toString());
+    } else {
+      setCount('0');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView>
@@ -59,14 +74,30 @@ const Flashcard = ({route}) => {
               borderRadius: 10,
             }}>
             <Button
+              title="Home"
+              color="white"
+              onPress={() => {
+                navigation.navigate('Home', {
+                  count,
+                  // setStateC,
+                });
+              }}
+            />
+          </View>
+          <View
+            style={{
+              backgroundColor: '#EC625F',
+              width: 150,
+              height: 50,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 10,
+            }}>
+            <Button
               title="Next Card >"
               color="white"
               onPress={() => {
-                if (parseInt(count) < 9) {
-                  setCount((parseInt(count) + 1).toString());
-                } else {
-                  setCount('0');
-                }
+                nextQues();
               }}
             />
           </View>
@@ -104,49 +135,56 @@ const Flashcard = ({route}) => {
             <View
               style={{
                 backgroundColor: 'green',
-                width: 100,
-                height: 50,
+                width: 110,
+                height: 60,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
               }}>
               <Button
-                title="I know"
+                title="👍 I know"
                 color={'white'}
                 onPress={() => {
                   incrementData('know');
+                  nextQues();
                 }}
               />
             </View>
             <View
               style={{
                 backgroundColor: 'red',
-                width: 120,
-                height: 50,
+                width: 140,
+                height: 60,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
                 margin: 10,
               }}>
               <Button
-                title="I don't know"
+                title="👎 Don't know"
                 color={'white'}
-                onPress={() => incrementData('dontKnow')}
+                onPress={() => {
+                  incrementData('dontKnow');
+                  nextQues();
+                }}
               />
             </View>
             <View
               style={{
                 backgroundColor: 'orange',
-                width: 140,
-                height: 50,
+                width: 100,
+                height: 60,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 10,
               }}>
               <Button
-                title="Need Research"
+                title="Need 📚 Research"
                 color={'white'}
-                onPress={() => incrementData('research')}
+                onPress={() => {
+                  incrementData('research');
+                  nextQues();
+                }}
               />
             </View>
           </View>

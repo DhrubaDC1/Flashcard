@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Home = ({navigation}) => {
+const Home = ({navigation, route}) => {
   // for controlling dark/light mode color schemes
   const colorScheme = Appearance.getColorScheme();
 
@@ -19,6 +19,22 @@ const Home = ({navigation}) => {
   const [stateK, setStateK] = useState(''); // know state
   const [stateD, setStateD] = useState(''); // don't know state
   const [stateR, setStateR] = useState(''); // research state
+  // const [stateC, setStateC] = useState(''); // count state
+  // const [countFlag, setCountFlag] = useState(false);
+  // console.warn(countFlag);
+
+  var transferCount = '0';
+
+  // if (route.params === undefined) {
+  //   console.warn('inside undefined');
+  // } else {
+  //   const {count} = route.params;
+  // }
+
+  // if (countFlag) {
+  //   console.warn(countFlag);
+  //   const {count} = route.params;
+  // }
 
   // fetching data everytime the screen loads
   useEffect(() => {
@@ -31,12 +47,15 @@ const Home = ({navigation}) => {
 
   // fetching data from Async Storage and putting in state variables
   const getData = async () => {
-    let know = await AsyncStorage.getItem('know');
-    setStateK(know);
-    know = await AsyncStorage.getItem('dontKnow');
-    setStateD(know);
-    know = await AsyncStorage.getItem('research');
-    setStateR(know);
+    let val = await AsyncStorage.getItem('know');
+    setStateK(val);
+    val = await AsyncStorage.getItem('dontKnow');
+    setStateD(val);
+    val = await AsyncStorage.getItem('research');
+    setStateR(val);
+    val = await AsyncStorage.getItem('count');
+    transferCount = val;
+    // setStateC(count);
   };
 
   // When called, reset all data to '0'
@@ -44,6 +63,8 @@ const Home = ({navigation}) => {
     await AsyncStorage.setItem('know', '0');
     await AsyncStorage.setItem('dontKnow', '0');
     await AsyncStorage.setItem('research', '0');
+    await AsyncStorage.setItem('count', '0');
+    getData();
   };
   return (
     <View style={styles.container}>
@@ -54,23 +75,42 @@ const Home = ({navigation}) => {
               margin: 100,
               borderRadius: 25,
               backgroundColor: '#525252',
-              padding: 40,
+              padding: 30,
               justifyContent: 'center',
               width: 350,
               height: 200,
             }}>
             <Text style={[styles.report, {color: 'green'}]}>
               {stateK}
-              <Text style={styles.report}> I know</Text>
+              <Text style={styles.report}> 👍 I know </Text>
             </Text>
             <Text style={[styles.report, {color: 'red'}]}>
               {stateD}
-              <Text style={styles.report}> I don't know</Text>
+              <Text style={styles.report}> 👎 I don't know</Text>
             </Text>
             <Text style={[styles.report, {color: 'orange'}]}>
               {stateR}
-              <Text style={styles.report}> Need Research</Text>
+              <Text style={styles.report}> 📚 Need Research</Text>
             </Text>
+          </View>
+          <View style={{alignItems: 'center', justifyContent: 'center'}}>
+            <View
+              style={{
+                backgroundColor: '#EC625F',
+                width: 120,
+                height: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 10,
+              }}>
+              <Button
+                title="Reset Score"
+                color="white"
+                onPress={() => {
+                  resetData();
+                }}
+              />
+            </View>
           </View>
           <View
             style={{
@@ -89,11 +129,24 @@ const Home = ({navigation}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  resetData();
+                  // resetData();
+                  // console.warn(countFlag);
+                  // if (countFlag) {
+                  //   transferCount = count;
+                  //   console.warn(transferCount);
+                  // }
+                  // setCountFlag(true);
+                  if (route.params === undefined) {
+                    console.warn('undefined');
+                  } else {
+                    const {count} = route.params;
+                    transferCount = count;
+                  }
                   navigation.navigate('Flashcard', {
                     setStateK,
                     setStateD,
                     setStateR,
+                    transferCount,
                   });
                 }}>
                 <Text
