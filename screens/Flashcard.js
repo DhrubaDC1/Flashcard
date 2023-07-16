@@ -67,6 +67,19 @@ const Flashcard = ({navigation, route}) => {
     setStateR(await AsyncStorage.getItem('research'));
   };
 
+  // for decreasing the existing value by 1
+  const decreaseData = async key => {
+    // initValue(key);
+    temp = await AsyncStorage.getItem(key);
+    temp = (parseInt(temp) - 1).toString();
+    setData(key, temp.toString());
+
+    // send the current progress to home screen
+    setStateK(await AsyncStorage.getItem('know'));
+    setStateD(await AsyncStorage.getItem('dontKnow'));
+    setStateR(await AsyncStorage.getItem('research'));
+  };
+
   // For getting the next question
   const nextQues = () => {
     if (parseInt(count) < 9) {
@@ -175,8 +188,16 @@ const Flashcard = ({navigation, route}) => {
                 color="white"
                 onPress={() => {
                   arrKnow.push(count);
+                  if (arrDontKnow.includes(count)) {
+                    // console.warn('dont know');
+                    decreaseData('dontKnow');
+                  } else if (arrResearch.includes(count)) {
+                    // console.warn('research');
+                    decreaseData('research');
+                  }
                   removeItemAll(arrDontKnow, count);
                   removeItemAll(arrResearch, count);
+
                   incrementData('know');
                   nextQues();
                 }}
@@ -197,6 +218,13 @@ const Flashcard = ({navigation, route}) => {
                 color={'white'}
                 onPress={() => {
                   arrDontKnow.push(count);
+                  if (arrKnow.includes(count)) {
+                    // console.warn('know');
+                    decreaseData('know');
+                  } else if (arrResearch.includes(count)) {
+                    // console.warn('research');
+                    decreaseData('research');
+                  }
                   removeItemAll(arrKnow, count);
                   removeItemAll(arrResearch, count);
                   incrementData('dontKnow');
@@ -220,6 +248,13 @@ const Flashcard = ({navigation, route}) => {
                 color={'white'}
                 onPress={() => {
                   arrResearch.push(count);
+                  if (arrKnow.includes(count)) {
+                    // console.warn('know');
+                    decreaseData('know');
+                  } else if (arrDontKnow.includes(count)) {
+                    // console.warn('dontKnow');
+                    decreaseData('dontKnow');
+                  }
                   removeItemAll(arrDontKnow, count);
                   removeItemAll(arrKnow, count);
                   incrementData('research');
